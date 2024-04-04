@@ -12,10 +12,10 @@ import (
 )
 
 type SignUpForm struct {
-	FirstName    string `json:"firstname" binding:"required"`
-	LastName    string `json:"lastname" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	FirstName string `json:"firstname" binding:"required"`
+	LastName  string `json:"lastname" binding:"required"`
+	Email     string `json:"email" binding:"required"`
+	Password  string `json:"password" binding:"required"`
 }
 
 func helloHandler(c *gin.Context) {
@@ -70,14 +70,14 @@ func main() {
 
 	// Enable CORS because we cant run frontend and backend on same port
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:8080"} // Frontend url:port
+	config.AllowOrigins = []string{"http://localhost:5173"} // Frontend url:port
 	engine.Use(cors.New(config))
 
 	engine.GET("/index.html", helloHandler)
 	engine.POST("/name", postHandler)
 	engine.POST("/signup", signUpHandler)
 
-	err := engine.Run(":5000")
+	err := engine.Run(":8080")
 	if err != nil {
 		log.Fatal(err)
 	}
