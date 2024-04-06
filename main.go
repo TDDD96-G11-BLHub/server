@@ -69,6 +69,7 @@ func signUpHandler(c *gin.Context) {
 	}
 
 	if len(errors) > 0 {
+		errors["errorMsg"] = "Your registration failed! Please check the form."
 		c.JSON(http.StatusBadRequest, errors)
 		return
 	}
