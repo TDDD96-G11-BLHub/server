@@ -12,10 +12,10 @@ import (
 )
 
 type SignUpForm struct {
-	FirstName string `json:"firstname" binding:"required"`
-	LastName  string `json:"lastname" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	Password  string `json:"password" binding:"required"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
 }
 
 func helloHandler(c *gin.Context) {
@@ -54,13 +54,36 @@ func signUpHandler(c *gin.Context) {
 		return
 	}
 
+	errors := make(map[string]string)
+	if form.FirstName == "" {
+		errors["firstNameError"] = "First name is required"
+	}
+	if form.LastName == "" {
+		errors["lastNameError"] = "Last name is required"
+	}
+	if form.Email == "" {
+		errors["emailError"] = "Email is required"
+	}
+	if form.Password == "" {
+		errors["passwordError"] = "Password is required"
+	}
+
+	if len(errors) > 0 {
+		c.JSON(http.StatusBadRequest, errors)
+		return
+	}
+
 	fmt.Println("Super secure form ;)")
 	fmt.Println("Firstname: ", form.FirstName)
 	fmt.Println("Lastname: ", form.LastName)
 	fmt.Println("Email: ", form.Email)
 	fmt.Println("Password: ", form.Password)
 
-	c.JSON(http.StatusOK, gin.H{"status": "Form submitted fine"})
+	// Include a custom message in the response
+	c.JSON(http.StatusOK, gin.H{
+		"status":     "Form submitted fine",
+		"successMsg": "Your registration is successful!",
+	})
 }
 
 func main() {
