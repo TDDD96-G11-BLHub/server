@@ -74,7 +74,7 @@ func signUpHandler(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Super secure form ;)")
+	fmt.Println("Super secure form")
 	fmt.Println("Firstname: ", form.FirstName)
 	fmt.Println("Lastname: ", form.LastName)
 	fmt.Println("Email: ", form.Email)
