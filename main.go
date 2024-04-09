@@ -16,33 +16,6 @@ type SignUpForm struct {
 	Password  string `json:"password"`
 }
 
-func helloHandler(c *gin.Context) {
-	fmt.Fprintln(c.Writer,
-		`<!DOCTYPE html>
-	<html>
-	<form method="post" action="/name">
-    <label for="firstname">First name:</label>
-    <input type="text" name="firstname" /><br />
-    <label for="lastname">Last name:</label>
-    <input type="text" name="lastname" /><br />
-    <input type="submit" />
-	</form></html>`)
-}
-
-func postHandler(c *gin.Context) {
-	err := c.Request.ParseForm()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	name := c.Request.Form.Get("firstname")
-	lastname := c.Request.Form.Get("lastname")
-	fmt.Println(name, lastname)
-
-	fmt.Fprintln(c.Writer, "Form submitted fine")
-}
-
 func signUpHandler(c *gin.Context) {
 	var form SignUpForm
 
@@ -95,8 +68,6 @@ func main() {
 	config.AllowOrigins = []string{"http://localhost:5173"} // Frontend url:port
 	engine.Use(cors.New(config))
 
-	engine.GET("/index.html", helloHandler)
-	engine.POST("/name", postHandler)
 	engine.POST("/signup", signUpHandler)
 
 	err := engine.Run(":8080")
