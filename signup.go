@@ -7,15 +7,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SignUpForm struct {
+var (
+	feedbackNoFirstName = "First name is required"
+	feedbackNoLastName  = "Last name is required"
+	feedbackNoEmail     = "Email is requried"
+	feedbackNoPassword  = "Password is requried"
+	feedbackFormMessage = "Your registration failed! Please check the form."
+)
+
+type signupFormData struct {
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
 
+type signupFormFeedback struct {
+	FirstName string `json:"firstNameError"`
+	LastName  string `json:"lastNameError"`
+	Email     string `json:"emailError"`
+	Password  string `json:"passwordError"`
+	Message   string `json:"errorMsg"`
+}
+
 func signUpHandler(c *gin.Context) {
-	var form SignUpForm
+	form := signupFormData{}
 
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -23,22 +39,23 @@ func signUpHandler(c *gin.Context) {
 		return
 	}
 
-	errors := make(map[string]string)
+	errors := signupFormFeedback{}
 	if form.FirstName == "" {
-		errors["firstNameError"] = "First name is required"
+		errors.FirstName = feedbackNoFirstName
 	}
 	if form.LastName == "" {
-		errors["lastNameError"] = "Last name is required"
+		errors.LastName = feedbackNoLastName
 	}
 	if form.Email == "" {
-		errors["emailError"] = "Email is required"
+		errors.Email = feedbackNoEmail
 	}
 	if form.Password == "" {
-		errors["passwordError"] = "Password is required"
+		errors.Password = feedbackNoPassword
 	}
 
-	if len(errors) > 0 {
-		errors["errorMsg"] = "Your registration failed! Please check the form."
+	emptyErrors := signupFormFeedback{}
+	if errors != emptyErrors {
+		errors.Message = feedbackFormMessage
 		c.JSON(http.StatusBadRequest, errors)
 		return
 	}
