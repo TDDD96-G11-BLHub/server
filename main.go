@@ -14,14 +14,14 @@ import (
 )
 
 func init() {
-	err := os.Mkdir("logs", 0777)
+	err := os.Mkdir("logs", 0o777)
 	if err != nil && !errors.Is(err, os.ErrExist) {
 		slog.Warn("Failed to create log", err)
 		return
 	}
 
 	filename := time.Now().Format("logs/" + time.DateTime + ".txt")
-	file, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o666)
 	if err != nil {
 		slog.Warn("Failed to open log file", err)
 		return
