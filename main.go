@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	sloggin "github.com/samber/slog-gin"
 )
 
 func init() {
@@ -37,23 +36,16 @@ func main() {
 	fmt.Println("Starting up BLHub server!")
 
 	engine := gin.New()
-
-	// Log with default gin logger and a middleware for log/slog.
-	// This makes sure that we get the fancy stdout logs but also log to the log file.
-	defaultGinLogger := gin.Logger()
-	slogginLogger := sloggin.New(slog.Default())
-	ginLogger := func(ctx *gin.Context) {
-		defaultGinLogger(ctx)
-		slogginLogger(ctx)
-	}
-	engine.Use(ginLogger, gin.Recovery())
+	engine.Use(gin.Logger(), gin.Recovery())
 
 	// Enable CORS because we cant run frontend and backend on same port
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:5173"} // Frontend url:port
 	engine.Use(cors.New(config))
 
-	engine.POST("/signup", signUpHandler)
+	users := &userHandler{}
+	engine.POST("/signup", users.signup)
+	engine.POST("/login", users.login)
 
 	err := engine.Run(":8080")
 	if err != nil {
