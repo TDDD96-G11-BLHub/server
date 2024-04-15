@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"slices"
@@ -32,8 +33,8 @@ type userHandler struct {
 
 func (u *userHandler) login(c *gin.Context) {
 	type loginData struct {
-		email    string
-		password string
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	form := &loginData{}
@@ -44,17 +45,19 @@ func (u *userHandler) login(c *gin.Context) {
 		return
 	}
 
+	fmt.Println(form)
+
 	u.mu.RLock()
-	contains := slices.ContainsFunc(u.users, func(item *user) bool { return item.Email == form.email && item.Password == form.password })
+	contains := slices.ContainsFunc(u.users, func(item *user) bool { return item.Email == form.Email && item.Password == form.Password })
 	u.mu.RUnlock()
 
 	if !contains {
 		c.JSON(http.StatusNotAcceptable, "A user with the specified email address already exists!")
-		slog.Warn("A user tried to login with the wrong email", slog.String("email", form.email))
+		slog.Warn("A user tried to login with the wrong email", slog.String("email", form.Email))
 		return
 	}
 
-	slog.Info("A new user logged in", slog.String("email", form.email))
+	slog.Info("A new user logged in", slog.String("email", form.Email))
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":     "Form submitted fine",
