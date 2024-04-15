@@ -1,92 +1,35 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
-	"net/http"
+	"io"
+	"log/slog"
+	"os"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-type SignUpForm struct {
-	FirstName string `json:"firstname"`
-	LastName  string `json:"lastname"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-}
+func init() {
+	err := os.Mkdir("logs", 0o777)
+	if err != nil && !errors.Is(err, os.ErrExist) {
+		slog.Warn("Failed to create log", err)
+		return
+	}
 
-type loginForm struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-func helloHandler(c *gin.Context) {
-	fmt.Fprintln(c.Writer,
-		`<!DOCTYPE html>
-	<html>
-	<form method="post" action="/name">
-    <label for="firstname">First name:</label>
-    <input type="text" name="firstname" /><br />
-    <label for="lastname">Last name:</label>
-    <input type="text" name="lastname" /><br />
-    <input type="submit" />
-	</form></html>`)
-}
-
-func postHandler(c *gin.Context) {
-	err := c.Request.ParseForm()
+	filename := time.Now().Format("logs/" + time.DateTime + ".txt")
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o666)
 	if err != nil {
-		fmt.Println(err)
+		slog.Warn("Failed to open log file", err)
 		return
 	}
 
-	name := c.Request.Form.Get("firstname")
-	lastname := c.Request.Form.Get("lastname")
-	fmt.Println(name, lastname)
-
-	fmt.Fprintln(c.Writer, "Form submitted fine")
-}
-
-func signUpHandler(c *gin.Context) {
-	var form SignUpForm
-
-	if err := c.ShouldBindJSON(&form); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		fmt.Println("ERROR ")
-		return
-	}
-
-	errors := make(map[string]string)
-	if form.FirstName == "" {
-		errors["firstNameError"] = "First name is required"
-	}
-	if form.LastName == "" {
-		errors["lastNameError"] = "Last name is required"
-	}
-	if form.Email == "" {
-		errors["emailError"] = "Email is required"
-	}
-	if form.Password == "" {
-		errors["passwordError"] = "Password is required"
-	}
-
-	if len(errors) > 0 {
-		errors["errorMsg"] = "Your registration failed! Please check the form."
-		c.JSON(http.StatusBadRequest, errors)
-		return
-	}
-
-	fmt.Println("Super secure form")
-	fmt.Println("Firstname: ", form.FirstName)
-	fmt.Println("Lastname: ", form.LastName)
-	fmt.Println("Email: ", form.Email)
-	fmt.Println("Password: ", form.Password)
-
-	// Include a custom message in the response
-	c.JSON(http.StatusOK, gin.H{
-		"successMsg": "Your registration is successful!",
-	})
+	writers := io.MultiWriter(file, os.Stderr)
+	opts := &slog.HandlerOptions{AddSource: true}
+	logger := slog.New(slog.NewTextHandler(writers, opts))
+	slog.SetDefault(logger)
 }
 
 func loginHandler(c *gin.Context) {
@@ -115,24 +58,22 @@ func loginHandler(c *gin.Context) {
 }
 
 func main() {
-	fmt.Println("Hello from BLHub server!")
+	fmt.Println("Starting up BLHub server!")
 
-	engine := gin.Default()
+	engine := gin.New()
+	engine.Use(gin.Logger(), gin.Recovery())
 
 	// Enable CORS because we cant run frontend and backend on same port
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:5173"} // Frontend url:port
 	engine.Use(cors.New(config))
 
-	engine.GET("/index.html", helloHandler)
-	engine.POST("/name", postHandler)
-	engine.POST("/signup", signUpHandler)
-	engine.POST("/login", loginHandler)
-	engine.GET("/map", mapHandler)
-	engine.GET("/map/:markerID", markerHandler)
+	users := &userHandler{}
+	engine.POST("/signup", users.signup)
+	engine.POST("/login", users.login)
 
 	err := engine.Run(":8080")
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Gin router encountered an error", slog.String("error", err.Error()))
 	}
 }
