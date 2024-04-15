@@ -16,6 +16,11 @@ type SignUpForm struct {
 	Password  string `json:"password"`
 }
 
+type loginForm struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func helloHandler(c *gin.Context) {
 	fmt.Fprintln(c.Writer,
 		`<!DOCTYPE html>
@@ -80,9 +85,33 @@ func signUpHandler(c *gin.Context) {
 
 	// Include a custom message in the response
 	c.JSON(http.StatusOK, gin.H{
-		"status":     "Form submitted fine",
 		"successMsg": "Your registration is successful!",
 	})
+}
+
+func loginHandler(c *gin.Context) {
+	var form loginForm
+
+	if err := c.ShouldBindJSON(&form); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println("ERROR ")
+		return
+	}
+
+	var testEmail string = "test@test.test"
+	var testPassword string = "testtest"
+
+	if testEmail != form.Email || testPassword != form.Password {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"errorMsg": "Your login failed! Something something on the dark side",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"successMsg": "Your login is successful!",
+	})
+
 }
 
 func main() {
@@ -98,6 +127,9 @@ func main() {
 	engine.GET("/index.html", helloHandler)
 	engine.POST("/name", postHandler)
 	engine.POST("/signup", signUpHandler)
+	engine.POST("/login", loginHandler)
+	engine.GET("/map", mapHandler)
+	engine.GET("/map/:markerID", markerHandler)
 
 	err := engine.Run(":8080")
 	if err != nil {
