@@ -44,8 +44,13 @@ func main() {
 	engine.Use(cors.New(config))
 
 	users := &userHandler{}
+
+	// User handlers
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
+
+	// Add sensor
+	engine.POST("/sensor-add", addSensorHandler)
 
 	// Map handlers
 	engine.GET("/map", mapHandler)
