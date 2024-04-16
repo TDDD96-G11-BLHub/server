@@ -51,6 +51,12 @@ func main() {
 	engine.GET("/map", mapHandler)
 	engine.GET("/map/:markerID", markerHandler)
 
+	// Bookmark handler
+	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
+
+	// Download json file from specific marker id
+	engine.GET("/download/:markerID", downloadHandler)
+
 	err := engine.Run(":8080")
 	if err != nil {
 		slog.Error("Gin router encountered an error", slog.String("error", err.Error()))
