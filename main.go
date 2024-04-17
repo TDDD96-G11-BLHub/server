@@ -51,6 +51,8 @@ func main() {
 	engine.GET("/map", mapHandler)
 	engine.GET("/map/:markerID", markerHandler)
 
+	engine.GET("/testDbConnection", testDbConnection)
+
 	err := engine.Run(":8080")
 	if err != nil {
 		slog.Error("Gin router encountered an error", slog.String("error", err.Error()))
