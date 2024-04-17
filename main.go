@@ -49,12 +49,12 @@ func main() {
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
 
-	// Add sensor
-	engine.POST("/sensordata/add", addSensorHandler)
+	mapData := &mapHandler{}
 
-	// Map handlers
-	engine.GET("/map", mapHandler)
-	engine.GET("/map/:markerID", markerHandler)
+	// Map data handlers
+	engine.POST("/sensordata/add", mapData.addSensorData)
+	engine.GET("/map", mapData.getMapCoordinates)
+	engine.GET("/map/:markerID", mapData.getMarker)
 
 	// Bookmark handler
 	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
