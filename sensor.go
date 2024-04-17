@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func addSensorHandler(c *gin.Context) {
 	type sensorData struct {
-		Longitude float64 `json:"longitude"`
-		Latitude  float64 `json:"latitude"`
-		Type      int     `json:"type"`
-		File      any     `json:"file"`
+		Longitude float64   `json:"longitude"`
+		Latitude  float64   `json:"latitude"`
+		Type      int       `json:"type"`
+		Data      string    `json:"file"`
+		Image     string    `json:"image"`
+		Date      time.Time `json:"timestamp"`
 	}
 
 	form := &sensorData{}
