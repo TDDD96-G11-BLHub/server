@@ -9,17 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func addSensorHandler(c *gin.Context) {
-	type sensorData struct {
-		Latitude  float64   `json:"latitude"`
-		Longitude float64   `json:"longitude"`
-		Type      int       `json:"type"`
-		Data      string    `json:"data"`
-		Image     string    `json:"image"`
-		Date      time.Time `json:"timestamp"`
-	}
+// SensorData represents the data for a specific sensor reading.
+type SensorData struct {
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
+	Type      string    `json:"sensorType"`
+	Data      string    `json:"data"`
+	Image     string    `json:"image"`
+	Date      time.Time `json:"timestamp"`
+}
 
-	form := &sensorData{}
+func addSensorHandler(c *gin.Context) {
+	form := &SensorData{}
 
 	if err := c.ShouldBindJSON(form); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
