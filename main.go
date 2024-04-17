@@ -1,15 +1,20 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"log/slog"
 	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func init() {
@@ -43,6 +48,25 @@ func main() {
 	config.AllowOrigins = []string{"http://localhost:5173"} // Frontend url:port
 	engine.Use(cors.New(config))
 
+	// Create connection to database
+	if errdb := godotenv.Load(); errdb != nil {
+		log.Println("No .env file found")
+	}
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		log.Fatal("You must set your 'MONGODB_URI' environment variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable")
+	}
+
+	client, errdb := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	if errdb != nil {
+		panic(errdb)
+	}
+	defer func() {
+		if errdb := client.Disconnect(context.TODO()); errdb != nil {
+			panic(errdb)
+		}
+	}()
+
 	users := &userHandler{}
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
@@ -51,7 +75,7 @@ func main() {
 	engine.GET("/map", mapHandler)
 	engine.GET("/map/:markerID", markerHandler)
 
-	engine.GET("/testDbConnection", testDbConnection)
+	engine.GET("/testDbConnection", testDbConnection(client))
 
 	err := engine.Run(":8080")
 	if err != nil {
