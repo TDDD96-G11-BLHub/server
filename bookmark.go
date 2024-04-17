@@ -15,7 +15,7 @@ func bookmarkHandler(c *gin.Context) {
 	fmt.Println("Marker ID: ", markerID)
 	fmt.Println("User ID: ", userID)
 
-	if(markerID == "1") {
+	if markerID == "1" {
 		c.JSON(http.StatusOK, gin.H{
 			"bookmarked": false,
 		})
