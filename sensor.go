@@ -11,10 +11,10 @@ import (
 
 func addSensorHandler(c *gin.Context) {
 	type sensorData struct {
-		Longitude float64   `json:"longitude"`
 		Latitude  float64   `json:"latitude"`
+		Longitude float64   `json:"longitude"`
 		Type      int       `json:"type"`
-		Data      string    `json:"file"`
+		Data      string    `json:"data"`
 		Image     string    `json:"image"`
 		Date      time.Time `json:"timestamp"`
 	}

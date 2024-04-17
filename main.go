@@ -50,7 +50,7 @@ func main() {
 	engine.POST("/login", users.login)
 
 	// Add sensor
-	engine.POST("/sensor-add", addSensorHandler)
+	engine.POST("/sensordata/add", addSensorHandler)
 
 	// Map handlers
 	engine.GET("/map", mapHandler)
