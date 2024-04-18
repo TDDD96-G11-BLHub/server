@@ -16,8 +16,8 @@ type sensorData struct {
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
 	Type      string    `json:"sensorType"`
-	Data      string    `json:"data"`
-	Image     string    `json:"image"`
+	CSV       string    `json:"data"`
+	Image     string    `json:"image"` // Not really hooked up. Probably should use something betetr than string.
 	Date      time.Time `json:"timestamp"`
 }
 
