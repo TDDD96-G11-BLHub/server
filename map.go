@@ -44,6 +44,7 @@ func (s *mapHandler) addSensorData(c *gin.Context) {
 	s.data = append(s.data, form)
 	s.mu.Unlock()
 }
+
 func (s *mapHandler) getMapCoordinates(c *gin.Context) {
 	fmt.Println("FETCH COORDINATES")
 
