@@ -39,7 +39,7 @@ func markerHandler(c *gin.Context) {
 	}
 
 	// current time
-	currentTime := time.Now().Format("2006-01-02 15:04:05")
+	currentTime := time.Now().Format(time.DateTime)
 
 	// Include a custom message in the response
 	c.JSON(http.StatusOK, gin.H{
