@@ -102,7 +102,7 @@ func (s *mapHandler) getMarker(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"sensorID":    id,
-		"sensorName":  data.Type + "sensor",
+		"sensorName":  data.Type + " sensor",
 		"sensorImage": "https://www.plantagen.se/dw/image/v2/BCMR_PRD/on/demandware.static/-/Library-Sites-PlantagenShared/default/dw258d02d2/1000/elefantore-pilea-peperomioides.jpg?sw=1024",
 		"sensorTypes": sensorTypes,
 		"lastUpdated": data.Date.Format(time.DateTime),
