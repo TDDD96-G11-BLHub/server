@@ -42,6 +42,8 @@ func (s *mapHandler) addSensorData(c *gin.Context) {
 	s.data = append(s.data, form)
 	s.mu.Unlock()
 
+	c.JSON(http.StatusOK, "Sensor data was added successfully")
+
 	slog.Info("Stored a new sensor data", "id", form.ID, "timestamp", form.Date)
 }
 
