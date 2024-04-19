@@ -44,12 +44,17 @@ func main() {
 	engine.Use(cors.New(config))
 
 	users := &userHandler{}
+
+	// User handlers
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
 
-	// Map handlers
-	engine.GET("/map", mapHandler)
-	engine.GET("/map/:markerID", markerHandler)
+	mapData := &mapHandler{}
+
+	// Map data handlers
+	engine.POST("/sensordata/add", mapData.addSensorData)
+	engine.GET("/map", mapData.getMapCoordinates)
+	engine.GET("/map/:markerID", mapData.getMarker)
 
 	// Bookmark handler
 	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
