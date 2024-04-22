@@ -44,6 +44,9 @@ func graphHandlerTest(c *gin.Context) {
 	})
 }
 
+/*
+	Function to be used with marker ID
+
 func graphHandler(c *gin.Context) {
 	markerID := c.Param("markerID")
 	fmt.Println("Marker ID: ", markerID)
@@ -89,3 +92,4 @@ func graphHandler(c *gin.Context) {
 		"lastUpdate":  "TEST UPDATE",
 	})
 }
+*/
