@@ -50,6 +50,8 @@ func main() {
 	// Map handlers
 	engine.GET("/map", mapHandler)
 	engine.GET("/map/:markerID", markerHandler)
+	//engine.GET("/analytics/:sensorID", graphHandler)
+	engine.GET("/analytics", graphHandlerTest)
 
 	err := engine.Run(":8080")
 	if err != nil {
