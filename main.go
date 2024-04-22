@@ -44,14 +44,24 @@ func main() {
 	engine.Use(cors.New(config))
 
 	users := &userHandler{}
+
+	// User handlers
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
 
-	// Map handlers
-	engine.GET("/map", mapHandler)
-	engine.GET("/map/:markerID", markerHandler)
-	//engine.GET("/analytics/:sensorID", graphHandler)
+	mapData := &mapHandler{}
+
+	// Map data handlers
+	engine.POST("/sensordata/add", mapData.addSensorData)
+	engine.GET("/map", mapData.getMapCoordinates)
+	engine.GET("/map/:markerID", mapData.getMarker)
 	engine.GET("/analytics", graphHandlerTest)
+
+	// Bookmark handler
+	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
+
+	// Download json file from specific marker id
+	engine.GET("/download/:markerID", downloadHandler)
 
 	err := engine.Run(":8080")
 	if err != nil {
