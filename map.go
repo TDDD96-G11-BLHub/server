@@ -21,6 +21,12 @@ type sensorData struct {
 	Date      time.Time `json:"timestamp"`
 }
 
+type sensorLocations struct {
+	CountryFlag  string `json:"countryFlag"`
+	CountryName  string `json:"countryName"`
+	SensorAmount string `json:"sensorAmount"`
+}
+
 type mapHandler struct {
 	id atomic.Uint64
 
@@ -65,16 +71,14 @@ func (s *mapHandler) getMapCoordinates(c *gin.Context) {
 	}
 	s.mu.RUnlock()
 
-	/*
-		// Fake coordinates data for the map:
-		markers = []coordinateData{
-			{ID: 1, Latitude: 30.1695, Longitude: 10.9354},
-			{ID: 2, Latitude: 61.1695, Longitude: 24.9354},
-			{ID: 3, Latitude: 63.1695, Longitude: 24.9354},
-			{ID: 4, Latitude: 64.1695, Longitude: 24.9354},
-			{ID: 5, Latitude: 65.1695, Longitude: 24.9354},
-		}
-	*/
+	// Fake coordinates data for the map:
+	// markers = []coordinateData{
+	// 	{ID: 1, Latitude: 30.1695, Longitude: 10.9354},
+	// 	{ID: 2, Latitude: 61.1695, Longitude: 24.9354},
+	// 	{ID: 3, Latitude: 63.1695, Longitude: 24.9354},
+	// 	{ID: 4, Latitude: 64.1695, Longitude: 24.9354},
+	// 	{ID: 5, Latitude: 65.1695, Longitude: 24.9354},
+	// }
 
 	c.JSON(http.StatusOK, gin.H{"markers": markers})
 
@@ -111,4 +115,23 @@ func (s *mapHandler) getMarker(c *gin.Context) {
 	})
 
 	slog.Info("Sent over data for a marker", "id", data.ID, "timestamp", data.Date)
+}
+
+func (s *mapHandler) getSensorCountriesList(c *gin.Context) {
+	param := c.Param("mapBounds")
+
+	slog.Info("test print: ", param)
+
+	// Fake sensor countries data:
+	locations := []sensorLocations{
+		{CountryFlag: "https://www.countryflags.com/wp-content/uploads/finland-flag-png-large.png", CountryName: "Finland", SensorAmount: "5"},
+		{CountryFlag: "https://www.countryflags.com/wp-content/uploads/sweden-flag-png-large.png", CountryName: "Sweden", SensorAmount: "3"},
+		{CountryFlag: "https://www.countryflags.com/wp-content/uploads/norway-flag-png-large.png", CountryName: "Norway", SensorAmount: "2"},
+		{CountryFlag: "https://www.countryflags.com/wp-content/uploads/denmark-flag-png-large.png", CountryName: "Denmark", SensorAmount: "1"},
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"locations": locations,
+	})
+
+	slog.Info("Sent over data for countries list")
 }
