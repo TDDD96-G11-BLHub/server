@@ -13,6 +13,7 @@ import (
 type user struct {
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
+	UserName  string `json:"username"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 }
@@ -23,6 +24,7 @@ func (u *user) LogValue() slog.Value {
 		slog.String("email", u.Email),
 		slog.String("firstname", u.FirstName),
 		slog.String("lastname", u.LastName),
+		slog.String("username", u.UserName),
 	)
 }
 

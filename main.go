@@ -55,6 +55,7 @@ func main() {
 	engine.POST("/sensordata/add", mapData.addSensorData)
 	engine.GET("/map", mapData.getMapCoordinates)
 	engine.GET("/map/:markerID", mapData.getMarker)
+	engine.GET("/sensorlocations/:mapBounds", mapData.getSensorCountriesList)
 
 	// Bookmark handler
 	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
