@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/TDDD96-G11-BLHub/dbman/db"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -67,15 +68,17 @@ func main() {
 		}
 	}()
 
+	db.TestConnection(client)
+
 	users := &userHandler{}
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
 
 	// Map handlers
-	engine.GET("/map", mapHandler)
+	engine.GET("/map", mapHandler(client))
 	engine.GET("/map/:markerID", markerHandler)
 
-	engine.GET("/testDbConnection", testDbConnection(client))
+	engine.GET("/analytics", graphHandler(client))
 
 	err := engine.Run(":8080")
 	if err != nil {
