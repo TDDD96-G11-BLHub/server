@@ -20,6 +20,7 @@ jobs:
         go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
         go install honnef.co/go/tools/cmd/staticcheck@latest
         go install mvdan.cc/gofumpt@latest
+        sudo apt update && sudo apt install cloc
 
     - name: Vet
       run: go vet ./...
@@ -32,3 +33,10 @@ jobs:
 
     - name: Staticcheck
       run: staticcheck ./...
+
+    - name: Comment to code ratio
+      uses: deep5050/comment-to-code-ratio-action@v1
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        issue_number: 1
+        options: '--quiet ./ --hide-rate --git --unix --md --out=report.md --timeout=20 --by-percent=cmb --by-file --exclude-lang=JSON,XML'
