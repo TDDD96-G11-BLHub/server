@@ -35,7 +35,7 @@ jobs:
       run: staticcheck ./...
 
     - name: Comment to code ratio
-      uses: deep5050/comment-to-code-ratio-action@v1
+      uses: deep5050/comment-to-code-ratio-action@main
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         issue_number: 1
