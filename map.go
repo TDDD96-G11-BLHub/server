@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -118,4 +119,40 @@ func (s *mapHandler) getMarker(c *gin.Context) {
 	})
 
 	slog.Info("Sent over data for a marker", "id", data.ID, "timestamp", data.Date)
+}
+
+// downloadHandler is a handler that runs when downloading sensor data.
+func (s *mapHandler) downloadHandler(c *gin.Context) {
+	fmt.Println("DOWNLOAD JSON FILE")
+
+	markerID := c.Param("markerID")
+	fmt.Println("Marker ID: ", markerID)
+
+	// Fake json data for the download:
+	jsonData := []byte(`{
+		"sensorID": 1,
+		"sensorName": "SENSOR EXAMPLE NAME",
+		"sensorImage": "https://www.plantagen.se/dw/image/v2/BCMR_PRD/on/demandware.static/-/Library-Sites-PlantagenShared/default/dw258d02d2/1000/elefantore-pilea-peperomioides.jpg?sw=1024",
+		"sensorTypes": [
+			{"type": "temperature", "unit": "°C"},
+			{"type": "humidity", "unit": "%"},
+			{"type": "light", "unit": "lux"},
+			{"type": "moisture", "unit": "%"}
+		],
+		"lastUpdated": "2021-01-01 12:00:00"
+	}`)
+
+	c.Data(http.StatusOK, "application/json", jsonData)
+}
+
+// bookmarkHandler is a handler that runs when the user bookmarks a sensor data location.
+func (s *mapHandler) bookmarkHandler(c *gin.Context) {
+	fmt.Println("BOOKMARK MARKER:")
+
+	markerID := c.Param("markerID")
+	userID := c.Param("userID")
+	fmt.Println("Marker ID: ", markerID)
+	fmt.Println("User ID: ", userID)
+
+	c.JSON(http.StatusOK, gin.H{"bookmarked": markerID != "1"})
 }

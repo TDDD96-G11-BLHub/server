@@ -45,22 +45,18 @@ func main() {
 
 	users := &userHandler{}
 
-	// User handlers
+	// User handlers:
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
 
 	mapData := &mapHandler{}
 
-	// Map data handlers
+	// Handlers related to map data:
 	engine.POST("/sensordata/add", mapData.addSensorData)
 	engine.GET("/map", mapData.getMapCoordinates)
 	engine.GET("/map/:markerID", mapData.getMarker)
-
-	// Bookmark handler
-	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
-
-	// Download json file from specific marker id
-	engine.GET("/download/:markerID", downloadHandler)
+	engine.GET("/download/:markerID", mapData.downloadHandler)
+	engine.GET("/bookmark/:markerID/:userID", mapData.bookmarkHandler)
 
 	err := engine.Run(":8080")
 	if err != nil {
