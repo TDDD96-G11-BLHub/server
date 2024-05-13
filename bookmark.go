@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// bookmarkHandler is a handler that runs when the user bookmarks a sensor data location.
 func bookmarkHandler(c *gin.Context) {
 	fmt.Println("BOOKMARK MARKER:")
 

@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// downloadHandler is a handler that runs when downloading sensor data.
 func downloadHandler(c *gin.Context) {
 	fmt.Println("DOWNLOAD JSON FILE")
 
