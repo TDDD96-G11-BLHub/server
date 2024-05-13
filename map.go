@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -123,10 +122,8 @@ func (s *mapHandler) getMarker(c *gin.Context) {
 
 // downloadHandler is a handler that runs when downloading sensor data.
 func (s *mapHandler) downloadHandler(c *gin.Context) {
-	fmt.Println("DOWNLOAD JSON FILE")
-
 	markerID := c.Param("markerID")
-	fmt.Println("Marker ID: ", markerID)
+	slog.Info("Initiated download of JSON data", slog.String("markerID", markerID))
 
 	// Fake json data for the download:
 	jsonData := []byte(`{
@@ -145,14 +142,13 @@ func (s *mapHandler) downloadHandler(c *gin.Context) {
 	c.Data(http.StatusOK, "application/json", jsonData)
 }
 
-// bookmarkHandler is a handler that runs when the user bookmarks a sensor data location.
+// bookmarkHandler is a handler that runs when the website checks if sensor data is bookmarked.
 func (s *mapHandler) bookmarkHandler(c *gin.Context) {
-	fmt.Println("BOOKMARK MARKER:")
-
 	markerID := c.Param("markerID")
 	userID := c.Param("userID")
-	fmt.Println("Marker ID: ", markerID)
-	fmt.Println("User ID: ", userID)
 
+	slog.Info("Checking if sensor data is bookmarked", slog.String("markerID", markerID), slog.String("userID", userID))
+
+	// Fake data for bookmarking:
 	c.JSON(http.StatusOK, gin.H{"bookmarked": markerID != "1"})
 }
