@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"slices"
@@ -10,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// user holds the details for a single user.
 type user struct {
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
@@ -26,11 +26,13 @@ func (u *user) LogValue() slog.Value {
 	)
 }
 
+// userHandler keeps track of all of the users and their corresponding data.
 type userHandler struct {
 	users []*user
 	mu    sync.RWMutex
 }
 
+// login is a handler that runs when the user tries to log in.
 func (u *userHandler) login(c *gin.Context) {
 	type loginData struct {
 		Email    string `json:"email"`
@@ -45,19 +47,28 @@ func (u *userHandler) login(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(form)
-
 	u.mu.RLock()
-	contains := slices.ContainsFunc(u.users, func(item *user) bool { return item.Email == form.Email && item.Password == form.Password })
-	u.mu.RUnlock()
 
-	if !contains {
-		c.JSON(http.StatusNotAcceptable, "A user with the specified email address already exists!")
+	// Check if the user exists in the database.
+	index := slices.IndexFunc(u.users, func(item *user) bool { return item.Email == form.Email })
+	if index == -1 {
+		c.JSON(http.StatusNotAcceptable, "No user exists with the specified email!")
 		slog.Warn("A user tried to login with the wrong email", slog.String("email", form.Email))
+		u.mu.RUnlock()
 		return
 	}
 
-	slog.Info("A new user logged in", slog.String("email", form.Email))
+	// Check if the user we found has a matching password.
+	if u.users[index].Password != form.Password {
+		c.JSON(http.StatusNotAcceptable, "Wrong password!")
+		slog.Warn("A user tried to login with the wrong password", slog.String("email", form.Email))
+		u.mu.RUnlock()
+		return
+	}
+
+	u.mu.RUnlock()
+
+	slog.Info("A user logged in", slog.String("email", form.Email))
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":     "Form submitted fine",
@@ -65,6 +76,7 @@ func (u *userHandler) login(c *gin.Context) {
 	})
 }
 
+// signup is a handler that runs when the user tries to create a new account.
 func (u *userHandler) signup(c *gin.Context) {
 	form := &user{}
 

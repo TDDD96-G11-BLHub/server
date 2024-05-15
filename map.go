@@ -11,16 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// sensorData keeps track of the data for an uploaded piece of sensor data.
 type sensorData struct {
 	ID        uint64    `json:"id"`
 	Latitude  float64   `json:"latitude"`
 	Longitude float64   `json:"longitude"`
 	Type      string    `json:"sensorType"`
 	CSV       string    `json:"data"`
-	Image     string    `json:"image"` // Not really hooked up. Probably should use something betetr than string.
+	Image     string    `json:"image"` // Not really hooked up. Probably should use something better than string.
 	Date      time.Time `json:"timestamp"`
 }
 
+// mapHandler keeps track of sensor data displayed on the map.
+// The handlers run in separate goroutines when getting network requests
+// so care should be taken to avoid race conditions.
 type mapHandler struct {
 	id atomic.Uint64
 
@@ -28,8 +32,9 @@ type mapHandler struct {
 	data []*sensorData
 }
 
+// addSensorData is a handler that runs when the user uploads sensor data to the server.
 func (s *mapHandler) addSensorData(c *gin.Context) {
-	id := s.id.Add(1) - 1 // Increment directly but decrement so we get zero-indexing.
+	id := s.id.Add(1) - 1 // Increment directly but decrement locally so we get zero-indexing (and no race between getting the index and incrementing later).
 	form := &sensorData{ID: id}
 
 	if err := c.ShouldBindJSON(form); err != nil {
@@ -47,6 +52,7 @@ func (s *mapHandler) addSensorData(c *gin.Context) {
 	slog.Info("Stored a new sensor data", "id", form.ID, "timestamp", form.Date)
 }
 
+// getMapCoordinates is a handler that runs when the website fetches map markers to draw.
 func (s *mapHandler) getMapCoordinates(c *gin.Context) {
 	type coordinateData struct {
 		ID        uint64  `json:"id"`
@@ -81,6 +87,7 @@ func (s *mapHandler) getMapCoordinates(c *gin.Context) {
 	slog.Info("Sent over all map coordinates")
 }
 
+// getMarker is a handler that runs when the website wants to get data for a specific marker.
 func (s *mapHandler) getMarker(c *gin.Context) {
 	param := c.Param("markerID")
 	id, err := strconv.Atoi(param)
@@ -111,4 +118,37 @@ func (s *mapHandler) getMarker(c *gin.Context) {
 	})
 
 	slog.Info("Sent over data for a marker", "id", data.ID, "timestamp", data.Date)
+}
+
+// downloadHandler is a handler that runs when downloading sensor data.
+func (s *mapHandler) downloadHandler(c *gin.Context) {
+	markerID := c.Param("markerID")
+	slog.Info("Initiated download of JSON data", slog.String("markerID", markerID))
+
+	// Fake json data for the download:
+	jsonData := []byte(`{
+		"sensorID": 1,
+		"sensorName": "SENSOR EXAMPLE NAME",
+		"sensorImage": "https://www.plantagen.se/dw/image/v2/BCMR_PRD/on/demandware.static/-/Library-Sites-PlantagenShared/default/dw258d02d2/1000/elefantore-pilea-peperomioides.jpg?sw=1024",
+		"sensorTypes": [
+			{"type": "temperature", "unit": "°C"},
+			{"type": "humidity", "unit": "%"},
+			{"type": "light", "unit": "lux"},
+			{"type": "moisture", "unit": "%"}
+		],
+		"lastUpdated": "2021-01-01 12:00:00"
+	}`)
+
+	c.Data(http.StatusOK, "application/json", jsonData)
+}
+
+// bookmarkHandler is a handler that runs when the website checks if sensor data is bookmarked.
+func (s *mapHandler) bookmarkHandler(c *gin.Context) {
+	markerID := c.Param("markerID")
+	userID := c.Param("userID")
+
+	slog.Info("Checking if sensor data is bookmarked", slog.String("markerID", markerID), slog.String("userID", userID))
+
+	// Fake data for bookmarking:
+	c.JSON(http.StatusOK, gin.H{"bookmarked": markerID != "1"})
 }

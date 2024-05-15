@@ -35,6 +35,16 @@ func init() {
 func main() {
 	fmt.Println("Starting up BLHub server!")
 
+	engine := setupRounter()
+
+	err := engine.Run(":8080")
+	if err != nil {
+		slog.Error("Gin router encountered an error", slog.String("error", err.Error()))
+	}
+}
+
+// setupRouter sets up all fo the routing paths for our Gin engine.
+func setupRounter() *gin.Engine {
 	engine := gin.New()
 	engine.Use(gin.Logger(), gin.Recovery())
 
@@ -45,25 +55,18 @@ func main() {
 
 	users := &userHandler{}
 
-	// User handlers
+	// User handlers:
 	engine.POST("/signup", users.signup)
 	engine.POST("/login", users.login)
 
 	mapData := &mapHandler{}
 
-	// Map data handlers
+	// Handlers related to map data:
 	engine.POST("/sensordata/add", mapData.addSensorData)
 	engine.GET("/map", mapData.getMapCoordinates)
 	engine.GET("/map/:markerID", mapData.getMarker)
+	engine.GET("/download/:markerID", mapData.downloadHandler)
+	engine.GET("/bookmark/:markerID/:userID", mapData.bookmarkHandler)
 
-	// Bookmark handler
-	engine.GET("/bookmark/:markerID/:userID", bookmarkHandler)
-
-	// Download json file from specific marker id
-	engine.GET("/download/:markerID", downloadHandler)
-
-	err := engine.Run(":8080")
-	if err != nil {
-		slog.Error("Gin router encountered an error", slog.String("error", err.Error()))
-	}
+	return engine
 }
